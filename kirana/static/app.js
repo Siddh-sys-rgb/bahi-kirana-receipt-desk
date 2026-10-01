@@ -142,9 +142,8 @@ function updateMath() {
     ? `✓ Totals line up: ${inr(subtotal)} + ${inr(fields.tax)} tax − ${inr(fields.discount)} discount = ${inr(calculated)}.`
     : `Check this difference: item amounts + tax − discount = ${inr(calculated)}. Receipt says ${inr(fields.total)} (${inr(Math.abs(difference))} ${difference >= 0 ? 'more' : 'less'}).`;
 }
-async function saveCurrent() {
-  const receipt = state.receipt;
-  return api(`/api/receipts/${encodeURIComponent(receipt.id)}`, jsonOptions('PUT', {revision:receipt.revision, fields:fieldsFromForm()}));
+async function saveCurrent(receipt, fields) {
+  return api(`/api/receipts/${encodeURIComponent(receipt.id)}`, jsonOptions('PUT', {revision:receipt.revision, fields}));
 }
 async function reviewAction(action) {
   if (state.busy || !state.receipt || state.receipt.status !== 'review') return;
@@ -154,19 +153,26 @@ async function reviewAction(action) {
     return;
   }
   state.busy = true;
+  const version = state.routeVersion;
+  let reviewed = state.receipt;
+  const fields = fieldsFromForm();
   $$('.review-actions button, #reject-review').forEach(button => button.disabled = true);
   try {
-    if (action === 'save' || action === 'approve') state.receipt = await saveCurrent();
+    if (action === 'save' || action === 'approve') reviewed = await saveCurrent(reviewed, fields);
     if (action === 'approve') {
-      const result = await api(`/api/receipts/${state.receipt.id}/approve`, jsonOptions('POST', {revision:state.receipt.revision, verified:true}));
-      state.receipt = result.receipt;
+      const result = await api(`/api/receipts/${reviewed.id}/approve`, jsonOptions('POST', {revision:reviewed.revision, verified:true}));
+      reviewed = result.receipt;
     }
-    if (action === 'reject') state.receipt = await api(`/api/receipts/${state.receipt.id}/reject`, jsonOptions('POST', {revision:state.receipt.revision}));
+    if (action === 'reject') reviewed = await api(`/api/receipts/${reviewed.id}/reject`, jsonOptions('POST', {revision:reviewed.revision}));
+    if (version === state.routeVersion) state.receipt = reviewed;
     toast({save:'Changes saved. Your bill is still waiting for approval.', approve:'Bill approved. One less thing on your list.', reject:'Bill rejected. No ledger entry was added.'}[action]);
-    await route();
+    if (version === state.routeVersion) await route();
   } catch (error) {
-    $('#review-error').textContent = error.message;
-    $('#review-error').classList.remove('hidden');
+    if (version === state.routeVersion) {
+      state.receipt = reviewed;
+      $('#review-error').textContent = error.message;
+      $('#review-error').classList.remove('hidden');
+    } else toast(error.message);
   } finally {
     state.busy = false;
     if (state.receipt?.status === 'review') $$('.review-actions button, #reject-review').forEach(button => button.disabled = false);

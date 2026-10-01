@@ -110,3 +110,9 @@ def test_one_paise_tolerance_is_explicit():
 def test_review_requires_an_object():
     with pytest.raises(ValidationError):
         normalize_review(None)
+
+
+def test_phone_invoice_numbers_and_payment_labels_do_not_become_amounts():
+    result = parse_receipt(TEXT + '\nPhone 9876543210\nInvoice 2026093012345\nTotal paid 0.00')
+    assert result['fields']['total'] == '696.00'
+    assert len(result['fields']['items']) == 2

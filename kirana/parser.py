@@ -121,14 +121,16 @@ def parse_receipt(text, scores=None):
         amount_match = re.search(rf'({NUMBER})\s*$', line)
         if not amount_match:
             continue
-        value = rupees(money(amount_match[1]))
-        if re.match(r'^(grand\s*total|net\s*total|total\s*payable|total\s*amount|total|amount\s*due)\b', line, re.I):
+        if re.fullmatch(rf'(grand\s*total|net\s*total|total\s*payable|total\s*amount|total|amount\s*due)\s*[:=]?\s*(?:₹|Rs\.?|INR)?\s*{NUMBER}', line, re.I):
+            value = rupees(money(amount_match[1]))
             result['total'] = value
             evidence['total'] = line
         elif re.match(r'^(cgst|sgst|igst|gst|tax)\b', line, re.I):
+            value = rupees(money(amount_match[1]))
             taxes.append(money(value))
             evidence.setdefault('tax', []).append(line)
         elif re.match(r'^discount\b', line, re.I):
+            value = rupees(money(amount_match[1]))
             result['discount'] = value
         else:
             match = re.match(rf'^(.+?)\s+({NUMBER})\s+({NUMBER})\s+({NUMBER})\s*$', line)
