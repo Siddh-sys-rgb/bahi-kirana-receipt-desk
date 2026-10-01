@@ -8,7 +8,7 @@ import secrets
 import sqlite3
 import uuid
 from pathlib import Path
-from flask import Flask, abort, jsonify, render_template, request, send_file, session
+from flask import Flask, abort, g, jsonify, render_template, request, send_file, session
 from PIL import Image, ImageOps, UnidentifiedImageError
 from werkzeug.exceptions import HTTPException
 from werkzeug.utils import secure_filename
@@ -47,7 +47,7 @@ def create_app(config=None):
 
     @app.teardown_appcontext
     def close_database(_):
-        connection = __import__('flask').g.pop('db', None)
+        connection = g.pop('db', None)
         if connection:
             connection.close()
 

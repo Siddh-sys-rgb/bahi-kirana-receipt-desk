@@ -2,6 +2,7 @@
 import importlib.util
 import threading
 from PIL import Image, ImageOps
+from .parser import ValidationError
 
 
 class OCRUnavailable(RuntimeError):
@@ -27,7 +28,7 @@ class ReceiptOCR:
             array = np.array(ImageOps.exif_transpose(image).convert('RGB'))
             result, _ = self._engine(array)
             if not result:
-                raise ValueError('No readable text was found. Try a sharper English receipt or paste its text.')
+                raise ValidationError('No readable text was found. Try a sharper English receipt or paste its text.')
             fragments = []
             for box, text, score in result:
                 fragments.append({'y': sum(p[1] for p in box)/4, 'x': min(p[0] for p in box),

@@ -11,6 +11,8 @@ class ValidationError(ValueError):
 def money(value):
     if isinstance(value, bool) or not isinstance(value, (str, int, float, Decimal)):
         raise ValidationError('Enter a valid amount with at most two decimal places.')
+    if len(str(value)) > 30:
+        raise ValidationError('Amount is too long.')
     try:
         number = Decimal(str(value).replace(',', '').strip())
     except InvalidOperation as exc:
@@ -40,6 +42,8 @@ def normalize_review(data):
         raise ValidationError('Review must be a JSON object.')
     merchant = clean_text(data.get('merchant'), 'Supplier')
     try:
+        if not isinstance(data.get('purchase_date'), str) or not re.fullmatch(r'\d{4}-\d{2}-\d{2}', data['purchase_date']):
+            raise ValueError
         purchase_date = date.fromisoformat(data.get('purchase_date', ''))
     except (ValueError, TypeError) as exc:
         raise ValidationError('Choose a valid purchase date.') from exc
@@ -60,6 +64,8 @@ def normalize_review(data):
         name = clean_text(item.get('name'), 'Item', 100)
         try:
             if isinstance(item.get('quantity'), bool):
+                raise InvalidOperation
+            if len(str(item.get('quantity', ''))) > 30:
                 raise InvalidOperation
             quantity = Decimal(str(item.get('quantity', '')))
         except InvalidOperation as exc:
@@ -110,6 +116,8 @@ def parse_receipt(text, scores=None):
             break
     taxes = []
     for line in lines:
+        if re.match(r'^(grand\s*total|net\s*total|total|amount\s*due|tax|[cs]gst|igst|gst|discount)\b', line, re.I) and re.search(r'-\s*\d[\d,]*(?:\.\d{1,2})?\s*$', line):
+            raise ValidationError('Negative receipt amounts are not supported. Check the original bill.')
         amount_match = re.search(rf'({NUMBER})\s*$', line)
         if not amount_match:
             continue
