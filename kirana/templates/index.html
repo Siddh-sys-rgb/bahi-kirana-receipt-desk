@@ -1,12 +1,564 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bahi · Kirana Receipt Desk</title><link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"><link rel="icon" href="{{ url_for('static', filename='mark.svg') }}" type="image/svg+xml"></head>
-<body>
-<aside class="sidebar"><a class="brand" href="#dashboard"><span class="brand-mark">b.</span><span><strong>bahi</strong><small>A little less paperwork.</small></span></a><div class="store-card"><span class="store-icon">▦</span><div><strong>Meera Kirana</strong><small>& General Store · Ahmedabad</small></div></div><p class="nav-label">YOUR WORKSPACE</p><nav aria-label="Main navigation"><a href="#dashboard" data-nav="dashboard"><span>◷</span> Overview</a><a href="#bills" data-nav="bills"><span>▤</span> Bill inbox <b id="nav-count">0</b></a><a href="#ledger" data-nav="ledger"><span>▦</span> Purchase khata</a></nav><div class="sidebar-note"><span>✦</span><strong>Your bills. Your final say.</strong><p>Read the receipt, check the figures, then add it to your khata.</p></div><div class="profile"><span class="avatar">MP</span><div><strong>Meera Patel</strong><small>Store owner · Demo workspace</small></div><span class="status-dot"></span></div></aside>
-<div class="workspace"><header class="topbar"><div class="breadcrumb">Meera Kirana <span>/</span> <strong id="page-label">Overview</strong></div><div class="header-actions"><span class="local-pill"><i></i> Local workspace</span><button class="primary small" data-upload>＋ Add a bill</button></div></header><main id="main">
-<section id="dashboard-view" class="view"><div class="page-heading"><div><p class="eyebrow">A CLEARER DAY AT THE DUKAAN</p><h1>A little order.<br>A lot less paperwork.</h1><p class="subtitle">Turn supplier bills into a purchase khata you can trust.</p></div><div class="ledger-illustration" aria-hidden="true"><div class="book"><span>MEERA KIRANA</span><b>Purchase<br>khata.</b><div class="book-lines"></div><small>Checked. Recorded. Sorted.</small></div><div class="paper-slip"><i>✓</i><span>Every rupee<br>accounted for.</span></div></div></div><div id="metrics" class="metrics"></div><div class="content-grid"><section class="panel inbox-panel"><div class="panel-title"><div><p class="eyebrow">YOUR NEXT SMALL STEP</p><h2>Bills waiting for a look</h2></div><a href="#bills" class="text-link">View all bills ↗</a></div><div id="pending-bills" class="bill-list"></div></section><section class="panel upload-card"><div class="dashed-icon">↥</div><h2>From paper to your khata.</h2><p>A clear receipt photo is all you need. We’ll read it; you check the details.</p><button class="primary" data-upload>Upload a receipt <span>↗</span></button><small>PNG, JPG or WebP · up to 5 MB</small><div class="quiet-note">No account or API key needed.<br>Images stay on this computer.</div></section></div><section class="how-it-works"><p class="eyebrow">THREE STEPS. ONE LESS THING ON YOUR MIND.</p><div><span><b>01</b> Add your bill</span><i>→</i><span><b>02</b> Check the details</span><i>→</i><span><b>03</b> Keep your khata</span></div></section></section>
-<section id="bills-view" class="view hidden"><div class="section-heading"><div><p class="eyebrow">PAPERWORK, WITH A PLACE</p><h1>Your bill inbox</h1><p class="subtitle">Every supplier bill, with its review status.</p></div><button class="primary" data-upload>＋ Add a bill</button></div><div class="filters" role="group" aria-label="Filter receipts"><button class="active" data-filter="all">All bills</button><button data-filter="review">To review</button><button data-filter="approved">Approved</button><button data-filter="rejected">Rejected</button></div><div id="all-bills" class="panel bill-list"></div></section>
-<section id="ledger-view" class="view hidden"><div class="section-heading"><div><p class="eyebrow">CHECKED AND ACCOUNTED FOR</p><h1>Your purchase khata</h1><p class="subtitle">Only bills you’ve reviewed and approved appear here.</p></div><a class="outline" href="/api/ledger.csv" download>↓ Export CSV</a></div><div id="ledger-metrics" class="metrics ledger-metrics"></div><div class="panel table-wrap"><table><thead><tr><th>Purchase date</th><th>Supplier</th><th>Category</th><th>Amount</th><th>Receipt</th></tr></thead><tbody id="ledger-rows"></tbody></table><div id="ledger-empty" class="empty-state hidden">Your khata starts with your first approved bill.</div></div><p class="footnote">Amounts are in INR. This is a purchase record, not a tax return or an udhaar ledger.</p></section>
-<section id="review-view" class="view hidden"><a href="#bills" class="back-link">← Back to bill inbox</a><div class="review-heading"><div><p class="eyebrow">A QUICK LOOK BEFORE IT GOES IN THE BOOK</p><h1 id="review-title">Check your bill</h1><p id="review-subtitle" class="subtitle"></p></div><span id="review-status" class="badge"></span></div><div class="review-grid"><section class="panel receipt-panel"><div class="receipt-tabs" role="group" aria-label="Receipt evidence"><button class="active" data-evidence="image">Receipt image</button><button data-evidence="text">Read text</button></div><div id="receipt-image-wrap" class="receipt-image-wrap"><img id="receipt-image" alt="Original supplier receipt"><p id="no-image" class="hidden">This receipt was added from pasted text. Open Read text to inspect the source.</p></div><pre id="raw-text" class="raw-text hidden"></pre><div class="source-note" id="source-note"></div></section><section class="panel fields-panel"><div class="panel-title"><div><p class="eyebrow">YOU HAVE THE FINAL SAY</p><h2>Review the details</h2></div><span class="currency">₹ INR</span></div><div id="review-warnings" class="warnings"></div><form id="review-form"><div class="field"><label for="merchant">Supplier name</label><input id="merchant" name="merchant" maxlength="150" required></div><div class="field-pair"><div class="field"><label for="purchase-date">Purchase date</label><input type="date" id="purchase-date" required></div><div class="field"><label for="category">Category</label><select id="category"><option>Stock purchase</option><option>Store supplies</option><option>Transport</option><option>Other</option></select></div></div><div class="items-title"><label>Items on this bill</label><button type="button" id="add-item" class="text-link">＋ Add item</button></div><div class="item-labels"><span>Item</span><span>Qty</span><span>Rate ₹</span><span>Amount ₹</span><span></span></div><div id="item-rows"></div><div class="field-pair adjustment-fields"><div class="field"><label for="tax">Tax on bill ₹</label><input id="tax" inputmode="decimal" value="0.00" required></div><div class="field"><label for="discount">Discount ₹</label><input id="discount" inputmode="decimal" value="0.00" required></div></div><div class="total-field"><label for="total">Receipt total ₹</label><input id="total" inputmode="decimal" required></div><div id="math-check" class="math-check" role="status"></div><label class="verification" id="verification-label"><input type="checkbox" id="verified"> <span>I checked these fields against the original receipt.</span></label><div id="review-error" class="form-error hidden" role="alert"></div><div class="review-actions"><button type="submit" class="outline" id="save-review">Save changes</button><button type="button" class="primary" id="approve-review">Approve & add to khata ✓</button></div><button type="button" id="reject-review" class="reject-link">Reject this bill</button></form><div id="closed-receipt" class="closed-receipt hidden"></div><details class="history"><summary>Review history</summary><div id="event-history"></div></details></section></div></section>
-</main><footer>Built for the little details that keep a dukaan running. <span>Fictional store & receipts · Local portfolio demo</span></footer></div>
-<dialog id="upload-dialog"><div class="dialog-heading"><div><p class="eyebrow">LET’S CLEAR A LITTLE PAPERWORK</p><h2>Add a supplier bill</h2></div><button class="icon-button" id="close-upload" aria-label="Close upload dialog">×</button></div><div class="upload-tabs" role="group" aria-label="Receipt input method"><button class="active" data-input="image">Receipt photo</button><button data-input="text">Paste bill text</button></div><form id="upload-form"><div id="image-input"><label class="dropzone" for="receipt-file"><span>↥</span><strong>Choose a receipt photo</strong><small id="file-name">PNG, JPG or WebP · up to 5 MB</small><input type="file" id="receipt-file" name="receipt" accept="image/png,image/jpeg,image/webp"></label><p class="upload-help">A sharp, straight photo of an English printed INR bill works best. Handwriting and Gujarati text need manual transcription.</p></div><div id="text-input" class="hidden field"><label for="receipt-text">Receipt text</label><textarea id="receipt-text" rows="10" maxlength="20000" placeholder="SHAH WHOLESALE&#10;Date: 30/09/2026&#10;Rice bag 2 450.00 900.00&#10;Grand Total 900.00"></textarea><p class="upload-help">One item per line: name, quantity, rate, amount. Text input uses transparent parsing rules.</p></div><div id="upload-error" class="form-error hidden" role="alert"></div><button class="primary full" type="submit" id="upload-submit">Read receipt →</button><small class="upload-privacy">Your receipt stays local. Always verify before approval.</small></form></dialog><div id="toast" class="toast hidden" role="status"></div><script src="{{ url_for('static', filename='app.js') }}"></script>
-</body></html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>
+      Bahi · Kirana Receipt Desk
+    </title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='mark.svg') }}" type="image/svg+xml">
+  </head>
+  <body>
+    <aside class="sidebar">
+      <a class="brand" href="#dashboard">
+        <span class="brand-mark">
+          b.
+        </span>
+        <span>
+          <strong>
+            bahi
+          </strong>
+          <small>
+            A little less paperwork.
+          </small>
+        </span>
+      </a>
+      <div class="store-card">
+        <span class="store-icon">
+          ▦
+        </span>
+        <div>
+          <strong>
+            Meera Kirana
+          </strong>
+          <small>
+            & General Store · Ahmedabad
+          </small>
+        </div>
+      </div>
+      <p class="nav-label">
+        YOUR WORKSPACE
+      </p>
+      <nav aria-label="Main navigation">
+        <a href="#dashboard" data-nav="dashboard">
+          <span>
+            ◷
+          </span>
+          Overview
+        </a>
+        <a href="#bills" data-nav="bills">
+          <span>
+            ▤
+          </span>
+          Bill inbox
+          <b id="nav-count">
+            0
+          </b>
+        </a>
+        <a href="#ledger" data-nav="ledger">
+          <span>
+            ▦
+          </span>
+          Purchase khata
+        </a>
+      </nav>
+      <div class="sidebar-note">
+        <span>
+          ✦
+        </span>
+        <strong>
+          Your bills. Your final say.
+        </strong>
+        <p>
+          Read the receipt, check the figures, then add it to your khata.
+        </p>
+      </div>
+      <div class="profile">
+        <span class="avatar">
+          MP
+        </span>
+        <div>
+          <strong>
+            Meera Patel
+          </strong>
+          <small>
+            Store owner · Demo workspace
+          </small>
+        </div>
+        <span class="status-dot">
+        </span>
+      </div>
+    </aside>
+    <div class="workspace">
+      <header class="topbar">
+        <div class="breadcrumb">
+          Meera Kirana
+          <span>
+            /
+          </span>
+          <strong id="page-label">
+            Overview
+          </strong>
+        </div>
+        <div class="header-actions">
+          <span class="local-pill">
+            <i>
+            </i>
+            Local workspace
+          </span>
+          <button class="primary small" data-upload>
+            ＋ Add a bill
+          </button>
+        </div>
+      </header>
+      <main id="main">
+        <section id="dashboard-view" class="view">
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">
+                A CLEARER DAY AT THE DUKAAN
+              </p>
+              <h1>
+                A little order.
+                <br>
+                A lot less paperwork.
+              </h1>
+              <p class="subtitle">
+                Turn supplier bills into a purchase khata you can trust.
+              </p>
+            </div>
+            <div class="ledger-illustration" aria-hidden="true">
+              <div class="book">
+                <span>
+                  MEERA KIRANA
+                </span>
+                <b>
+                  Purchase
+                  <br>
+                  khata.
+                </b>
+                <div class="book-lines">
+                </div>
+                <small>
+                  Checked. Recorded. Sorted.
+                </small>
+              </div>
+              <div class="paper-slip">
+                <i>
+                  ✓
+                </i>
+                <span>
+                  Every rupee
+                  <br>
+                  accounted for.
+                </span>
+              </div>
+            </div>
+          </div>
+          <div id="metrics" class="metrics">
+          </div>
+          <div class="content-grid">
+            <section class="panel inbox-panel">
+              <div class="panel-title">
+                <div>
+                  <p class="eyebrow">
+                    YOUR NEXT SMALL STEP
+                  </p>
+                  <h2>
+                    Bills waiting for a look
+                  </h2>
+                </div>
+                <a href="#bills" class="text-link">
+                  View all bills ↗
+                </a>
+              </div>
+              <div id="pending-bills" class="bill-list">
+              </div>
+            </section>
+            <section class="panel upload-card">
+              <div class="dashed-icon">
+                ↥
+              </div>
+              <h2>
+                From paper to your khata.
+              </h2>
+              <p>
+                A clear receipt photo is all you need. We’ll read it; you check the details.
+              </p>
+              <button class="primary" data-upload>
+                Upload a receipt
+                <span>
+                  ↗
+                </span>
+              </button>
+              <small>
+                PNG, JPG or WebP · up to 5 MB
+              </small>
+              <div class="quiet-note">
+                No account or API key needed.
+                <br>
+                Images stay on this computer.
+              </div>
+            </section>
+          </div>
+          <section class="how-it-works">
+            <p class="eyebrow">
+              THREE STEPS. ONE LESS THING ON YOUR MIND.
+            </p>
+            <div>
+              <span>
+                <b>
+                  01
+                </b>
+                Add your bill
+              </span>
+              <i>
+                →
+              </i>
+              <span>
+                <b>
+                  02
+                </b>
+                Check the details
+              </span>
+              <i>
+                →
+              </i>
+              <span>
+                <b>
+                  03
+                </b>
+                Keep your khata
+              </span>
+            </div>
+          </section>
+        </section>
+        <section id="bills-view" class="view hidden">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">
+                PAPERWORK, WITH A PLACE
+              </p>
+              <h1>
+                Your bill inbox
+              </h1>
+              <p class="subtitle">
+                Every supplier bill, with its review status.
+              </p>
+            </div>
+            <button class="primary" data-upload>
+              ＋ Add a bill
+            </button>
+          </div>
+          <div class="filters" role="group" aria-label="Filter receipts">
+            <button class="active" data-filter="all">
+              All bills
+            </button>
+            <button data-filter="review">
+              To review
+            </button>
+            <button data-filter="approved">
+              Approved
+            </button>
+            <button data-filter="rejected">
+              Rejected
+            </button>
+          </div>
+          <div id="all-bills" class="panel bill-list">
+          </div>
+        </section>
+        <section id="ledger-view" class="view hidden">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">
+                CHECKED AND ACCOUNTED FOR
+              </p>
+              <h1>
+                Your purchase khata
+              </h1>
+              <p class="subtitle">
+                Only bills you’ve reviewed and approved appear here.
+              </p>
+            </div>
+            <a class="outline" href="/api/ledger.csv" download>
+              ↓ Export CSV
+            </a>
+          </div>
+          <div id="ledger-metrics" class="metrics ledger-metrics">
+          </div>
+          <div class="panel table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>
+                    Purchase date
+                  </th>
+                  <th>
+                    Supplier
+                  </th>
+                  <th>
+                    Category
+                  </th>
+                  <th>
+                    Amount
+                  </th>
+                  <th>
+                    Receipt
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="ledger-rows">
+              </tbody>
+            </table>
+            <div id="ledger-empty" class="empty-state hidden">
+              Your khata starts with your first approved bill.
+            </div>
+          </div>
+          <p class="footnote">
+            Amounts are in INR. This is a purchase record, not a tax return or an udhaar ledger.
+          </p>
+        </section>
+        <section id="review-view" class="view hidden">
+          <a href="#bills" class="back-link">
+            ← Back to bill inbox
+          </a>
+          <div class="review-heading">
+            <div>
+              <p class="eyebrow">
+                A QUICK LOOK BEFORE IT GOES IN THE BOOK
+              </p>
+              <h1 id="review-title">
+                Check your bill
+              </h1>
+              <p id="review-subtitle" class="subtitle">
+              </p>
+            </div>
+            <span id="review-status" class="badge">
+            </span>
+          </div>
+          <div class="review-grid">
+            <section class="panel receipt-panel">
+              <div class="receipt-tabs" role="group" aria-label="Receipt evidence">
+                <button class="active" data-evidence="image">
+                  Receipt image
+                </button>
+                <button data-evidence="text">
+                  Read text
+                </button>
+              </div>
+              <div id="receipt-image-wrap" class="receipt-image-wrap">
+                <img id="receipt-image" alt="Original supplier receipt">
+                <p id="no-image" class="hidden">
+                  This receipt was added from pasted text. Open Read text to inspect the source.
+                </p>
+              </div>
+              <pre id="raw-text" class="raw-text hidden">
+              </pre>
+              <div class="source-note" id="source-note">
+              </div>
+            </section>
+            <section class="panel fields-panel">
+              <div class="panel-title">
+                <div>
+                  <p class="eyebrow">
+                    YOU HAVE THE FINAL SAY
+                  </p>
+                  <h2>
+                    Review the details
+                  </h2>
+                </div>
+                <span class="currency">
+                  ₹ INR
+                </span>
+              </div>
+              <div id="review-warnings" class="warnings">
+              </div>
+              <form id="review-form">
+                <div class="field">
+                  <label for="merchant">
+                    Supplier name
+                  </label>
+                  <input id="merchant" name="merchant" maxlength="150" required>
+                </div>
+                <div class="field-pair">
+                  <div class="field">
+                    <label for="purchase-date">
+                      Purchase date
+                    </label>
+                    <input type="date" id="purchase-date" required>
+                  </div>
+                  <div class="field">
+                    <label for="category">
+                      Category
+                    </label>
+                    <select id="category">
+                      <option>
+                        Stock purchase
+                      </option>
+                      <option>
+                        Store supplies
+                      </option>
+                      <option>
+                        Transport
+                      </option>
+                      <option>
+                        Other
+                      </option>
+                    </select>
+                  </div>
+                </div>
+                <div class="items-title">
+                  <label>
+                    Items on this bill
+                  </label>
+                  <button type="button" id="add-item" class="text-link">
+                    ＋ Add item
+                  </button>
+                </div>
+                <div class="item-labels">
+                  <span>
+                    Item
+                  </span>
+                  <span>
+                    Qty
+                  </span>
+                  <span>
+                    Rate ₹
+                  </span>
+                  <span>
+                    Amount ₹
+                  </span>
+                  <span>
+                  </span>
+                </div>
+                <div id="item-rows">
+                </div>
+                <div class="field-pair adjustment-fields">
+                  <div class="field">
+                    <label for="tax">
+                      Tax on bill ₹
+                    </label>
+                    <input id="tax" inputmode="decimal" value="0.00" required>
+                  </div>
+                  <div class="field">
+                    <label for="discount">
+                      Discount ₹
+                    </label>
+                    <input id="discount" inputmode="decimal" value="0.00" required>
+                  </div>
+                </div>
+                <div class="total-field">
+                  <label for="total">
+                    Receipt total ₹
+                  </label>
+                  <input id="total" inputmode="decimal" required>
+                </div>
+                <div id="math-check" class="math-check" role="status">
+                </div>
+                <label class="verification" id="verification-label">
+                  <input type="checkbox" id="verified">
+                  <span>
+                    I checked these fields against the original receipt.
+                  </span>
+                </label>
+                <div id="review-error" class="form-error hidden" role="alert">
+                </div>
+                <div class="review-actions">
+                  <button type="submit" class="outline" id="save-review">
+                    Save changes
+                  </button>
+                  <button type="button" class="primary" id="approve-review">
+                    Approve & add to khata ✓
+                  </button>
+                </div>
+                <button type="button" id="reject-review" class="reject-link">
+                  Reject this bill
+                </button>
+              </form>
+              <div id="closed-receipt" class="closed-receipt hidden">
+              </div>
+              <details class="history">
+                <summary>
+                  Review history
+                </summary>
+                <div id="event-history">
+                </div>
+              </details>
+            </section>
+          </div>
+        </section>
+      </main>
+      <footer>
+        Built for the little details that keep a dukaan running.
+        <span>
+          Fictional store & receipts · Local portfolio demo
+        </span>
+      </footer>
+    </div>
+    <dialog id="upload-dialog">
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">
+            LET’S CLEAR A LITTLE PAPERWORK
+          </p>
+          <h2>
+            Add a supplier bill
+          </h2>
+        </div>
+        <button class="icon-button" id="close-upload" aria-label="Close upload dialog">
+          ×
+        </button>
+      </div>
+      <div class="upload-tabs" role="group" aria-label="Receipt input method">
+        <button class="active" data-input="image">
+          Receipt photo
+        </button>
+        <button data-input="text">
+          Paste bill text
+        </button>
+      </div>
+      <form id="upload-form">
+        <div id="image-input">
+          <label class="dropzone" for="receipt-file">
+            <span>
+              ↥
+            </span>
+            <strong>
+              Choose a receipt photo
+            </strong>
+            <small id="file-name">
+              PNG, JPG or WebP · up to 5 MB
+            </small>
+            <input type="file" id="receipt-file" name="receipt" accept="image/png,image/jpeg,image/webp">
+          </label>
+          <p class="upload-help">
+            A sharp, straight photo of an English printed INR bill works best. Handwriting and Gujarati text need manual transcription.
+          </p>
+        </div>
+        <div id="text-input" class="hidden field">
+          <label for="receipt-text">
+            Receipt text
+          </label>
+          <textarea id="receipt-text" rows="10" maxlength="20000" placeholder="SHAH WHOLESALE&#10;Date: 30/09/2026&#10;Rice bag 2 450.00 900.00&#10;Grand Total 900.00">
+          </textarea>
+          <p class="upload-help">
+            One item per line: name, quantity, rate, amount. Text input uses transparent parsing rules.
+          </p>
+        </div>
+        <div id="upload-error" class="form-error hidden" role="alert">
+        </div>
+        <button class="primary full" type="submit" id="upload-submit">
+          Read receipt →
+        </button>
+        <small class="upload-privacy">
+          Your receipt stays local. Always verify before approval.
+        </small>
+      </form>
+    </dialog>
+    <div id="toast" class="toast hidden" role="status">
+    </div>
+    <script src="{{ url_for('static', filename='app.js') }}">
+    </script>
+  </body>
+</html>
