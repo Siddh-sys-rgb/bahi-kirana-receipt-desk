@@ -1,0 +1,5 @@
+[
+  {"id":"demo-shah","image":"shah-wholesale.png","status":"approved","text":"SHAH WHOLESALE\nEllisbridge, Ahmedabad\nBill No: SW-1042\nDate: 28/09/2026\nItem Qty Rate Amount\nRice bag 2 450.00 900.00\nToor Dal 4 145.00 580.00\nOil pouch 6 110.00 660.00\nSubtotal 2140.00\nDiscount 40.00\nGrand Total 2100.00\nPaid by UPI\nThank you"},
+  {"id":"demo-dairy","image":"desai-dairy.png","status":"review","text":"DESAI DAIRY SUPPLIERS\nNavrangpura, Ahmedabad\nBill No: DD-215\nDate: 29/09/2026\nItem Qty Rate Amount\nMilk pack 12 28.00 336.00\nPaneer pack 4 90.00 360.00\nSubtotal 696.00\nGrand Total 696.00\nPaid by UPI\nThank you"},
+  {"id":"demo-staples","image":"patel-staples.png","status":"review","text":"PATEL STAPLES\nPaldi, Ahmedabad\nBill No: PS-088\nDate: 29/09/2026\nItem Qty Rate Amount\nWheat Atta 3 240.00 720.00\nTea packet 4 125.00 500.00\nSubtotal 1220.00\nGrand Total 1250.00\nPlease verify this fictional bill\nThank you"}
+]
