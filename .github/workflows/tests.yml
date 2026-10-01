@@ -1,0 +1,37 @@
+name: Receipt desk tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.10', '3.12']
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+            constraints-tested.txt
+      - name: Install OpenCV system libraries
+        run: sudo apt-get update && sudo apt-get install -y libgl1 libglib2.0-0
+      - name: Install tested dependencies
+        run: python -m pip install -r requirements-dev.txt -c constraints-tested.txt
+      - name: Validate dependencies
+        run: python -m pip check
+      - name: Run API, transaction and actual OCR tests
+        run: python -m pytest --cov=kirana --cov-report=term-missing
+      - name: Evaluate the authored receipt images
+        run: python scripts/evaluate_ocr.py
