@@ -49,8 +49,13 @@ async function route() {
     if (name === 'review') {
       state.receipt = null;
       $('#review-title').textContent = 'Loading your bill…';
-      const receipt = await api('/api/receipts/' + encodeURIComponent(decodeURIComponent(hash.slice(7))));
+      $('.review-grid').classList.add('hidden');
+      const [receipt, inbox] = await Promise.all([
+        api('/api/receipts/' + encodeURIComponent(decodeURIComponent(hash.slice(7)))),
+        api('/api/receipts?status=review')
+      ]);
       if (version !== state.routeVersion) return;
+      $('#nav-count').textContent = inbox.summary.pending;
       renderReview(receipt);
       const history = await api(`/api/receipts/${encodeURIComponent(receipt.id)}/events`);
       if (version !== state.routeVersion) return;
