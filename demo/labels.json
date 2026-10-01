@@ -1,0 +1,27 @@
+{
+  "demo-shah": {
+    "merchant": "SHAH WHOLESALE", "purchase_date": "2026-09-28", "currency": "INR", "category": "Stock purchase",
+    "items": [
+      {"name": "Rice bag", "quantity": "2", "unit_price": "450.00", "amount": "900.00"},
+      {"name": "Toor Dal", "quantity": "4", "unit_price": "145.00", "amount": "580.00"},
+      {"name": "Oil pouch", "quantity": "6", "unit_price": "110.00", "amount": "660.00"}
+    ],
+    "tax": "0.00", "discount": "40.00", "total": "2100.00"
+  },
+  "demo-dairy": {
+    "merchant": "DESAI DAIRY SUPPLIERS", "purchase_date": "2026-09-29", "currency": "INR", "category": "Stock purchase",
+    "items": [
+      {"name": "Milk pack", "quantity": "12", "unit_price": "28.00", "amount": "336.00"},
+      {"name": "Paneer pack", "quantity": "4", "unit_price": "90.00", "amount": "360.00"}
+    ],
+    "tax": "0.00", "discount": "0.00", "total": "696.00"
+  },
+  "demo-staples": {
+    "merchant": "PATEL STAPLES", "purchase_date": "2026-09-29", "currency": "INR", "category": "Stock purchase",
+    "items": [
+      {"name": "Wheat Atta", "quantity": "3", "unit_price": "240.00", "amount": "720.00"},
+      {"name": "Tea packet", "quantity": "4", "unit_price": "125.00", "amount": "500.00"}
+    ],
+    "tax": "0.00", "discount": "0.00", "total": "1250.00"
+  }
+}

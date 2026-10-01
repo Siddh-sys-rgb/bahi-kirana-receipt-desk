@@ -8,6 +8,7 @@ import pytest
 from kirana import db
 from kirana.ocr import OCRUnavailable
 from kirana.parser import ValidationError
+from kirana.parser import parse_receipt
 from conftest import TEXT, image_bytes
 
 
@@ -198,7 +199,7 @@ def test_missing_fields_can_be_reviewed_manually(client, csrf):
     assert response.status_code == 201
     assert 'validation_error' in response.json['checks']
     assert approve(client, csrf, response.json).status_code == 422
-    assert save(client, csrf, response.json, __import__('kirana.parser', fromlist=['parse_receipt']).parse_receipt(TEXT)['fields']).status_code == 200
+    assert save(client, csrf, response.json, parse_receipt(TEXT)['fields']).status_code == 200
 
 
 def test_csv_escapes_spreadsheet_formulas_and_quotes(client, csrf, receipt):

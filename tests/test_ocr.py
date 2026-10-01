@@ -1,4 +1,5 @@
 import io
+import json
 
 import pytest
 from PIL import Image
@@ -33,8 +34,8 @@ def test_actual_local_model_extracts_authored_receipt_fields(sample):
     with Image.open(ROOT / 'demo' / sample['image']) as image:
         text, scores = model.extract(image)
     actual = parse_receipt(text, scores)
-    expected = parse_receipt(sample['text'])
-    assert actual['fields'] == expected['fields']
+    labels = json.loads((ROOT / 'demo' / 'labels.json').read_text())
+    assert actual['fields'] == labels[sample['id']]
     assert actual['ocr_score'] is not None
     assert normalize_review(actual['fields'])[1]['balanced'] == (sample['id'] != 'demo-staples')
 
