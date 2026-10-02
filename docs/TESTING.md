@@ -1,6 +1,6 @@
 # Bahi validation record
 
-The implementation was checked locally using macOS, Python 3.12.14, Flask 3.1.3, RapidOCR 1.4.4 and ONNX Runtime 1.19.2. The dependency versions are recorded in `constraints-tested.txt`. No remote CI run or GitHub upload was performed.
+The implementation was checked locally using macOS, Python 3.12.14, Flask 3.1.3, RapidOCR 1.4.4 and ONNX Runtime 1.19.2. The dependency versions are recorded in `constraints-tested.txt`. Those initial checks preceded publication. Linux Python 3.10/3.12 tests and real OCR evaluation now run in [GitHub Actions](https://github.com/Siddh-sys-rgb/bahi-kirana-receipt-desk/actions/workflows/tests.yml).
 
 ## Automated results
 
@@ -54,4 +54,4 @@ The screenshots in `docs/screenshots/` are actual captures from these checks. Th
 
 Add your own consented, redacted receipt images and independent field labels before claiming broader extraction accuracy. A varied evaluation set should include different store layouts, skew, blur, tax formats, low contrast and unsupported scripts. Treat arithmetic consistency as a review aid: it cannot establish that a model read the right figures.
 
-The local concurrency tests verify ledger correctness for the tested two-worker cases; they are not a load test. Linux/Windows installations and the prepared CI matrix have not been executed in this delivery. There is no production authentication, external audit store or background job system.
+The local concurrency tests verify ledger correctness for the tested two-worker cases; they are not a load test. The GitHub CI matrix also validates Linux; Windows installation has not been verified. There is no production authentication, external audit store or background job system.

@@ -1,5 +1,7 @@
 # Bahi Kirana Receipt Desk
 
+[![Tests](https://github.com/Siddh-sys-rgb/bahi-kirana-receipt-desk/actions/workflows/tests.yml/badge.svg)](https://github.com/Siddh-sys-rgb/bahi-kirana-receipt-desk/actions/workflows/tests.yml)
+
 A Flask app that turns supplier receipt images into a reviewed purchase khata for a fictional Ahmedabad kirana store. Upload a bill, inspect the local OCR output, correct the fields, and approve it into a SQLite ledger. A receipt with inconsistent totals cannot be approved.
 
 **Python 3.10–3.12 · Flask · SQLite · RapidOCR and ONNX Runtime · Vanilla JavaScript · No API key**
@@ -22,6 +24,13 @@ The paper colours, green ledger accents and original book illustration are inspi
 ## Set up locally
 
 Install **64-bit Python 3.10, 3.11 or 3.12**. Python 3.12 is the tested version. Python 3.13+ is outside this dependency set because the pinned NumPy and ONNX Runtime versions have older wheel support. You do not need Node, a GPU, Tesseract, a cloud account or an API key.
+
+Clone the standalone repository first (or download its ZIP):
+
+```bash
+git clone https://github.com/Siddh-sys-rgb/bahi-kirana-receipt-desk.git kirana-receipt-desk
+cd kirana-receipt-desk
+```
 
 From this project's folder on macOS or Linux:
 
@@ -106,7 +115,7 @@ These are browser captures of the locally running Flask app, not mockups. The ov
 
 ![The purchase khata includes the reviewed supplier bill](docs/screenshots/purchase-khata.jpg)
 
-The [mobile overview](docs/screenshots/mobile-overview.jpg) was captured at 390 × 844. These relative image links will render when the repository is uploaded to GitHub; no screenshot hosting service is needed.
+The [mobile overview](docs/screenshots/mobile-overview.jpg) was captured at 390 × 844. These relative image links render directly on GitHub; no screenshot hosting service is needed.
 
 ## How it works
 
@@ -180,7 +189,7 @@ Tests create temporary databases and files and do not mutate your interactive wo
 
 Local validation: **98 tests passed, 97% Python statement coverage**, including four actual OCR checks. All three authored images matched their independent field labels in the acceptance run. This small set of clean synthetic images does **not** estimate performance on real customer receipts. See [validation details](docs/TESTING.md).
 
-The included GitHub Actions workflow is prepared for Python 3.10 and 3.12 on Linux. It has not been run remotely: this project is currently local and has no GitHub remote.
+The GitHub Actions workflow checks Python 3.10 and 3.12 on Linux, including real OCR inference and the receipt acceptance evaluation. See [current CI runs](https://github.com/Siddh-sys-rgb/bahi-kirana-receipt-desk/actions/workflows/tests.yml).
 
 ## Assumptions and boundaries
 
@@ -208,6 +217,6 @@ The included GitHub Actions workflow is prepared for Python 3.10 and 3.12 on Lin
 
 ## Development history and references
 
-This is a standalone local Git repository. The actual commits separate skeleton/dependencies, INR validation and storage, OCR/API, samples, layout, interactions, regression fixes, tests/evaluation, documentation/screenshots, and CI. Commit timestamps reflect the actual work; there is no fabricated development timeline. Private design review notes are held outside this repository and are not part of its commits.
+This is a standalone Git repository. The actual commits separate skeleton/dependencies, INR validation and storage, OCR/API, samples, layout, interactions, regression fixes, tests/evaluation, documentation/screenshots, and CI. Commit timestamps reflect the actual work; there is no fabricated development timeline. Private design review notes are held outside this repository and are not part of its commits.
 
 Implementation references: [Flask file uploads](https://flask.palletsprojects.com/en/stable/patterns/fileuploads/), [RapidOCR 1.4.4](https://pypi.org/project/rapidocr-onnxruntime/1.4.4/), and [Python sqlite3 transactions](https://docs.python.org/3/library/sqlite3.html). Source code and authored fixtures use the [MIT license](LICENSE); dependency/model licenses remain their own. No external receipt dataset was used or fine-tuned for this demo.
